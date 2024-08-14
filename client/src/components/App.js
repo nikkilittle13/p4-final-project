@@ -10,6 +10,7 @@ function App() {
   const [clients, setClients] = useState([]);
   const [stylists, setStylists] = useState([]);
   const [appointments, setAppointments] = useState([]);
+  const [services, setServices] = useState([]);
 
   useEffect(() => {
     fetch('http://localhost:5555/clients')
@@ -28,11 +29,15 @@ function App() {
   useEffect(() => {
     fetch('http://localhost:5555/appointments')
   .then(response => response.json())
-  .then(data => {
-    console.log('Appointments fetched:', data);
-    setAppointments(data);
-  })
-  .catch(error => console.error('Error fetching appointments:', error));
+  .then(data => setAppointments(data))
+  .catch(error => console.error('Error:', error));
+  }, []);
+
+  useEffect(() => {
+    fetch('http://localhost:5555/services')
+  .then(response => response.json())
+  .then(data => setServices(data))
+  .catch(error => console.error('Error:', error));
   }, []);
 
   const fetchClients = async () => {
@@ -62,8 +67,6 @@ function App() {
         const error = await response.text();
         throw new Error(`Network response was not ok. Server responded with: ${error}`);
       }
-  
-      // Fetch the updated client list
       fetchClients();
     } catch (error) {
       console.error('Error:', error);
@@ -79,7 +82,7 @@ function App() {
       const stylists = await response.json();
       setStylists(stylists);
     } catch (error) {
-      console.error('Error fetching clients:', error);
+      console.error('Error fetching stylists:', error);
     }
   };
 
@@ -97,12 +100,9 @@ function App() {
         const error = await response.text();
         throw new Error(`Network response was not ok. Server responded with: ${error}`);
       }
-  
-      // Fetch the updated stylist list
       fetchStylists();
     } catch (error) {
       console.error('Error:', error);
-      alert('There was a problem adding the stylist. Please try again.');
     }
   };
 
@@ -111,14 +111,13 @@ function App() {
       const response = await fetch('http://localhost:5555/appointments');
       
       if (!response.ok) {
-        throw new Error(`Network response was not ok: ${response.statusText}`);
+        throw new Error(`Network response was not ok`);
       }
       
-      const data = await response.json();
-      setAppointments(data);
+      const appointments = await response.json();
+      setAppointments(appointments);
     } catch (error) {
       console.error('Error fetching appointments:', error);
-      // Optionally, you could set an error state here to inform users of the problem
     }
   };
   
@@ -137,12 +136,9 @@ function App() {
         const error = await response.text();
         throw new Error(`Network response was not ok. Server responded with: ${error}`);
       }
-  
-      // Fetch the updated appointment list
       fetchAppointments();
     } catch (error) {
       console.error('Error:', error);
-      alert('There was a problem adding the appointment. Please try again.');
     }
   };
   
@@ -150,7 +146,10 @@ function App() {
     <Router>
       <NavBar />
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route
+        path="/"
+        element={<Home />}
+        />
         <Route
           path="/appointments"
           element={
@@ -161,14 +160,26 @@ function App() {
               clients={clients}
               setClients={setClients}
               onAddAppointment={handleAddAppointment}
-            />
-          }
+              services={services}
+              setServices={setServices}
+            />}
         />
         <Route
           path="/clients"
-          element={<Clients clients={clients} onAddClient={handleAddClient} />}
+          element={
+            <Clients
+              clients={clients}
+              onAddClient={handleAddClient}
+            />}
         />
-        <Route path="/stylists" element={<Stylists stylists={stylists} onAddStylist={handleAddStylist} />} />
+        <Route
+          path="/stylists"
+          element={
+            <Stylists
+              stylists={stylists}
+              onAddStylist={handleAddStylist}
+            />}
+        />
       </Routes>
     </Router>
   );

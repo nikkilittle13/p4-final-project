@@ -1,34 +1,28 @@
-#!/usr/bin/env python3
-
-# Standard library imports
-from random import randint, choice as rc
+from random import randint, choice as rc, sample
 import random
 
-# Remote library imports
 from faker import Faker
 
-# Local imports
 from app import app
-from models import db, Client, Stylist, Appointment, Service, appointment_service
+from models import db, Client, Stylist, Appointment, Service, AppointmentService
 
 fake = Faker()
 
 def create_clients():
     clients = []
-    for _ in range(20):
+    for _ in range(15):
         c = Client(
             first_name=fake.first_name(),
             last_name=fake.last_name(),
-            phone_number=fake.phone_number(),
+            phone_number=random.randint(1000000000, 9999999999),
             email=fake.email(),
-            stylist_id=randint(1, 5)
         )
         clients.append(c)
     return clients
 
 def create_stylists():
     stylists = []
-    for _ in range(5):
+    for _ in range(8):
         s = Stylist(
             name=fake.first_name(),
         )
@@ -62,38 +56,36 @@ def create_services():
         price=50.00
     )
     services.append(s5)
+    s6 = Service(
+        type='Beard Trim',
+        price=20.00
+    )
+    services.append(s6)
     return services
 
 def create_appointments():
     appointments = []
-    for _ in range(50):
-        a = Appointment(
+    for _ in range(15):
+        appointment = Appointment(
             date=fake.date_this_year(),
-            time=randint(8,17),
-            stylist_id=rc([stylist.id for stylist in stylists]),
-            client_id=rc([client.id for client in clients])
+            time=f"{randint(8, 17)}:00",
+            stylist=rc(stylists),
+            client=rc(clients)
         )
-        appointments.append(a)
-    return appointments
-
-def create_appointment_services(appointments, services):
-    for appointment in appointments:
-        # Randomly decide how many services to associate with each appointment
-        num_services = randint(1, 3)  # Each appointment gets 1 to 3 services
-        
-        # Randomly choose services
-        chosen_services = random.sample(services, min(num_services, len(services)))  # Choose up to `num_services` unique services
-        
-        for service in chosen_services:
-            # Add each (appointment, service) pair to the association table
-            db.session.execute(
-                appointment_service.insert().values(
-                    appointment_id=appointment.id,
-                    service_id=service.id,
-                    quantity=randint(1, 3)  # Random quantity
-                )
+        appointment_services = sample(services, randint(1, 6))
+        for service in appointment_services:
+            appointment_service = AppointmentService(
+                appointment=appointment,
+                service=service,
+                notes=fake.sentence()
             )
+            db.session.add(appointment_service)
+
+        appointments.append(appointment)
+        db.session.add(appointment)
+
     db.session.commit()
+    return appointments
 
 
 if __name__ == '__main__':
@@ -105,6 +97,7 @@ if __name__ == '__main__':
         Stylist.query.delete()
         Service.query.delete()
         Appointment.query.delete()
+        AppointmentService.query.delete()
 
         print("Creating stylists...")
         stylists = create_stylists()
@@ -126,11 +119,4 @@ if __name__ == '__main__':
         db.session.add_all(appointments)
         db.session.commit()
 
-        print("Creating appointment services...")
-        create_appointment_services(appointments, services)
-        db.session.commit()
-
-
         print("Seeding complete.")
-        
-

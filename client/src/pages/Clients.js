@@ -1,39 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import ClientForm from '../components/ClientForm';
+import ClientCard from '../components/ClientCard';
 
-const Clients = ({ clients, onAddClient }) => {
-  const [showClients, setShowClients] = React.useState(false);
-
-  useEffect(() => {
-    console.log('Clients updated:', clients);
-  }, [clients]);
+function Clients({ clients, onAddClient }) {
+  const [showClients, setShowClients] = useState(false);
 
   return (
     <div>
-      <h1>Clients</h1>
+      <h1 className='title'>Clients</h1>
       <ClientForm onSubmit={onAddClient} />
-      <button onClick={() => setShowClients(prev => !prev)}>
+      <button className='button' onClick={() => setShowClients(prev => !prev)}>
         {showClients ? 'Hide Client List' : 'View Client List'}
       </button>
-      {showClients && (
-        <ul>
-          {clients.length > 0 ? (
-            clients.map((client) => (
-              <li key={client.id}>
-                <p><strong>Name:</strong> {client.first_name} {client.last_name}</p>
-                <p><strong>Email:</strong> {client.email}</p>
-                <p><strong>Phone:</strong> {client.phone_number}</p>
-                <button onClick={() => console.log('View appointments for', client.id)}>View Appointments</button>
-              </li>
-            ))
-          ) : (
-            <p>No clients available.</p>
-          )}
-        </ul>
-      )}
+      {showClients && <ClientCard clients={clients} />}
     </div>
   );
 };
 
 export default Clients;
-

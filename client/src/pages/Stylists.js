@@ -1,38 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import StylistForm from '../components/StylistForm'
+import StylistForm from '../components/StylistForm';
+import StylistCard from '../components/StylistCard';
 
-const Stylists = ({ stylists, onAddStylist }) => {
+function Stylists({ stylists, onAddStylist }) {
   const [showStylists, setShowStylists] = useState(false);
-
-  useEffect(() => {
-    console.log('Stylists updated:', stylists);
-  }, [stylists]);
 
   return (
     <div>
-      <h1>Stylists</h1>
+      <h1 className='title'>Stylists</h1>
       <StylistForm onSubmit={onAddStylist} />
-      <button onClick={() => setShowStylists(prev => !prev)}>
+      <button className='button' onClick={() => setShowStylists(prev => !prev)}>
         {showStylists ? 'Hide Stylist List' : 'View Stylist List'}
       </button>
-      {showStylists && (
-        <ul>
-          {stylists.length > 0 ? (
-            stylists.map((stylist) => (
-              <li key={stylist.id}>
-                <p><strong>Name:</strong> {stylist.name}</p>
-                <button onClick={() => console.log('View appointments for', stylist.id)}>View Appointments</button>
-              </li>
-            ))
-          ) : (
-            <p>No stylists available.</p>
-          )}
-        </ul>
-      )}
+      {showStylists && <StylistCard stylists={stylists} />}
     </div>
   );
 };
 
 export default Stylists;
-
-

@@ -5,19 +5,23 @@ function NavBar() {
   return (
     <nav className="navbar">
       <NavLink
-      to="/">
+      to="/"
+      className="nav-link">
         Home
       </NavLink>
       <NavLink
-      to="/clients">
+      to="/clients"
+      className="nav-link">
         Clients
       </NavLink>
       <NavLink
-      to="/stylists">
+      to="/stylists"
+      className="nav-link">
         Stylists
       </NavLink>
       <NavLink
-      to="/appointments">
+      to="/appointments"
+      className="nav-link">
         Appointments
       </NavLink>
     </nav>

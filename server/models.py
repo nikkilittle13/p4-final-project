@@ -1,14 +1,6 @@
 from sqlalchemy_serializer import SerializerMixin
-from sqlalchemy.ext.associationproxy import association_proxy
 
 from config import db
-
-appointment_service = db.Table(
-    'appointment_service',
-    db.Column('appointment_id', db.Integer, db.ForeignKey('appointments.id'), primary_key=True),
-    db.Column('service_id', db.Integer, db.ForeignKey('services.id'), primary_key=True),
-    db.Column('notes', db.String)
-)
 
 class Stylist(db.Model, SerializerMixin):
   __tablename__ = 'stylists'
@@ -35,12 +27,27 @@ class Client(db.Model, SerializerMixin):
  
   appointments = db.relationship('Appointment', back_populates='client', cascade='all, delete-orphan')
 
-
   serialize_rules = ('-appointments.client',)
 
   def __repr__(self):
     return f'<Client {self.id}> {self.first_name}, {self.last_name}, {self.phone_number}, {self.email}'
+  
+class AppointmentService(db.Model, SerializerMixin):
+  __tablename__ = 'appointment_service'
 
+  id = db.Column(db.Integer, primary_key=True)
+  notes = db.Column(db.String)
+
+  appointment_id = db.Column(db.Integer, db.ForeignKey('appointments.id'))
+  service_id = db.Column(db.Integer, db.ForeignKey('services.id'))
+
+  appointment = db.relationship('Appointment', back_populates='appointment_services')
+  service = db.relationship('Service', back_populates='appointment_services')
+
+  serialize_rules = ('-appointment.appointment_services', '-service.appointment_services')
+
+  def __repr__(self):
+    return f'<AppointmentService {self.id}> {self.appointment_id}, {self.service_id}, {self.notes}'
 
 class Appointment(db.Model, SerializerMixin):
   __tablename__ = 'appointments'
@@ -51,13 +58,12 @@ class Appointment(db.Model, SerializerMixin):
   stylist_id = db.Column(db.Integer, db.ForeignKey('stylists.id'))
   client_id = db.Column(db.Integer, db.ForeignKey('clients.id'))
 
-  services = db.relationship('Service', secondary='appointment_service', back_populates='appointments')
+  appointment_services = db.relationship('AppointmentService', back_populates='appointment', cascade='all, delete-orphan')
  
   stylist = db.relationship('Stylist', back_populates='appointments')
   client = db.relationship('Client', back_populates='appointments')
 
-
-  serialize_rules = ('-stylist.appointments', '-client.appointments', '-services.appointments')
+  serialize_rules = ('-stylist.appointments', '-client.appointments')
 
   def __repr__(self):
     return f'<Appointment {self.id}> {self.date}, {self.time}'
@@ -71,10 +77,7 @@ class Service(db.Model, SerializerMixin):
   price = db.Column(db.Float)
 
 
-  appointments = db.relationship('Appointment', secondary='appointment_service', back_populates='services')
-
-
-  serialize_rules = ('-appointments.services',)
+  appointment_services = db.relationship('AppointmentService', back_populates='service', cascade='all, delete-orphan')
 
   def __repr__(self):
     return f'<Service {self.id}> {self.type}, {self.price}'
