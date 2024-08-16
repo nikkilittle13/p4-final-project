@@ -221,7 +221,6 @@ function AppointmentForm({ clients, stylists, setAppointments, appointmentToEdit
             </div>
             <div>
               <button className="button "type="submit" onClick={onUpdate}>{appointmentToEdit ? 'Update Appointment' : 'Confirm Appointment'}</button>
-              {appointmentToEdit && (<button className='button' type="button" onClick={onDelete}>Delete Appointment</button>)}
             </div>
           </Form>
         )}
