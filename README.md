@@ -31,29 +31,27 @@ This program was designed for salons to keep record of their stylists, clients, 
 ### Installation
 
 1. Clone the repository
-
-2. Navigate to the project directory
 ```javaScript
 git clone git@github.com:nikkilittle13/p4-final-project.git
 ```
 
-3. Change to the project directory
+2. Navigate to the project directory
 ```javaScript
 cd p4-final-project
 ```
 
-4. Install dependencies using pipenv & npm install
+3. Install dependencies using pipenv & npm install
 ```javascript
 pipenv install
 npm install --prefix client
 ```
 
-5. Activate the virtual environment
+4. Activate the virtual environment
 ```javascript
 pipenv shell
 ```
 
-6. Run your back end and front end in two different consoles
+5. Run your back end and front end in two different consoles
 ```javascript
 flask run
 npm start --prefix client
