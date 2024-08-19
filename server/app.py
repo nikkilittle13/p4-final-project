@@ -184,19 +184,5 @@ class Services(Resource):
 
 api.add_resource(Services, '/services') 
 
-#get all appointments service price > 100
-#loop through service and return appointments
-
-@app.route('/services_by_price')
-def services_by_price():
-    services = Service.query.filter(Service.price >= 100).all()
-    new_appointments = []
-    for s in services:
-        for appt in s.appointments:
-            print(appt)
-            new_appointments.append(appt.to_dict())
-
-    return new_appointments
-
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
